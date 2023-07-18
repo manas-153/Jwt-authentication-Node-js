@@ -98,7 +98,7 @@ const loginuser = async(req,res)=>
 
                 // set the jwt token into cookies 
                 res.cookie("Jwt",Jwt_Token.Token,{
-                    expires:new Date(Date.now()+ 180000),
+                    expires:new Date(Date.now()+ 600000),
                 });
 
                 // ----------------- 
