@@ -93,7 +93,7 @@ const loginuser = async(req,res)=>
                 hour: "numeric",
                 minute: "numeric",
                 second: "numeric",});;
-                console.log('expiry date',expires_date);
+
 
                 // set the jwt token into cookies 
                 res.cookie("Jwt",Jwt_Token.Token,{
