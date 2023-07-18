@@ -11,7 +11,7 @@ const Databse_conn=require('../database/connection');
 
 require('dotenv').config(); 
 
-const PORT= 8000 || process.env.PORT;
+const PORT= process.env.PORT || 8000;
 
 // middlewares 
 app.use(bodyParser.json());

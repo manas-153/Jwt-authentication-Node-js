@@ -2,19 +2,56 @@ const schema=require('../database/schema');
 const bcrypt = require("bcryptjs");
 const saltRounds = 10;
 const jwt=require('jsonwebtoken');
-const cookies_parse=require('cookie-parser')
+require('dotenv').config(); 
 
 // give the list of all users 
 const getAllUsers = async (req,res)=>
 {
     try{
-        // fetching all the data in the collection 
-        let res_back=await schema.find();
-        res.send(res_back);
+          
+        let Token=req.headers.cookie.substr(27,430);
+
+        // if we find tokrn in headers 
+        if(Token)
+        {
+            // verify jwt token with secret key 
+            if(jwt.verify(Token,process.env.SECRET_KEY))
+            {
+                 // fetching all the data in the collection 
+                   let res_back=await schema.find();
+
+                 res.send({
+                status:"Token verified",
+                res_back
+                     });
+
+            }
+
+            else
+            {
+                res.send({
+                    status:'failed',
+                    msg:'Invalid signature'
+                })
+            }
+        }
+
+        else{
+            res.status(400).json({
+                status:"Unauthorized",
+                msg:"Token expired please login again to access this page"
+            })
+        }
+        
     }
+
+
     catch(err)
     {
-       console.log(err);
+       res.send({
+        status:'failed',
+        msg:err.message,
+       })
     }
     
 }
@@ -43,26 +80,38 @@ const loginuser = async(req,res)=>
                 let Jwt_Token=await createToken(user_payload);
     
                 // -------------- 
+               
+            
+                let startdate= new Date(Date.now()).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",});
 
+                let expires_date=new Date(Date.now()+ 180000).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",});;
+                console.log('expiry date',expires_date);
 
                 // set the jwt token into cookies 
-
                 res.cookie("Jwt",Jwt_Token.Token,{
-                    expires:new Date(Date.now()+80000),
+                    expires:new Date(Date.now()+ 180000),
                 });
 
                 // ----------------- 
 
-                // console.log()
 
 
                   res.send({
                     status:'success',
                     msg:`welcome ${res_back.Name}`,
                     Token:Jwt_Token.Token,
+                    Token_Intialize_at:startdate,
+                    Token_expiry:expires_date,
                     res_back
                   })
              }
+
              else{
                 // if the Password doesn't match 
                 res.status(400).send({
@@ -73,6 +122,7 @@ const loginuser = async(req,res)=>
              }
           
            }
+           
            else{
             res.status(400).send({
                 status:"falied",
@@ -92,14 +142,13 @@ const loginuser = async(req,res)=>
     }
 }
 
-// this function will generate a jwt token anf return to the called function 
+// this function will generate a jwt token and return to the called function 
 const createToken= async(user_data)=>
 {
     try
     {
-        let secretKey="thisismytestsecretkeywhichhelpstogeneratejwttokenthiskeyisencrypted";
-        let Token=await jwt.sign({user_data},secretKey);
-        return {Token,secretKey};
+        let Token=await jwt.sign({user_data},process.env.SECRET_KEY);
+        return {Token};
     }
     catch(err)
     {
@@ -150,5 +199,27 @@ const create_user = async(req,res)=>
     }
 }
 
+
+// Clear the cookies storage 
+const logout = async(req,res)=>
+{
+    try
+    {
+        res.clearCookie('Jwt').send({
+            ststus:'success',
+            msg:"cookies cleared"}
+            );
+
+    }
+    catch(err)
+    {
+        res.status(400).send({
+            status:"failed",
+            masg:err.message
+        })
+    }
+   
+}
+
 // this function wull store the generated token on cookies storage 
-module.exports={getAllUsers,loginuser,create_user};
+module.exports={getAllUsers,loginuser,create_user,logout};
