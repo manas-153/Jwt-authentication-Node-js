@@ -9,7 +9,9 @@ const getAllUsers = async (req,res)=>
 {
     try{
           
-        const Token = (req.headers.cookie).split('; ').find(cookie => cookie.startsWith('Jwt=')).split('=')[1] || null;
+        let Finded_Token=(req.headers.cookie).split(';').find(cookie => cookie.startsWith(' Jwt='));
+
+        let Token=(Finded_Token ? Finded_Token.split('=')[1] :null);
 
         // if we find tokrn in headers 
         if(Token)
@@ -221,5 +223,43 @@ const logout = async(req,res)=>
    
 }
 
+const show_secrets = (req,res)=>
+{
+    try{
+
+    let Finded_Token=(req.headers.cookie).split(';').find(cookie => cookie.startsWith(' Jwt='));
+
+        let Token=(Finded_Token ? Finded_Token.split('=')[1] :null);
+
+        if(Token)
+        {
+            res.status(200).json({
+                msg:"Decoded json token and secret Key",
+                Payload:{
+                Decoded_Token: jwt.decode(Token),
+                // Decoded_secret_Key:
+                }
+              })
+        }
+        
+        else
+        {
+            res.status(400).json({
+                status:'failed',
+                msg:'Not an authorized request'
+            })
+        }
+     
+}
+
+   catch(err)
+   {
+      res.status(400).send({
+        status:'failed',
+        msg:err.message,
+      })
+   }
+}
+
 // this function wull store the generated token on cookies storage 
-module.exports={getAllUsers,loginuser,create_user,logout};
+module.exports={getAllUsers,loginuser,create_user,logout,show_secrets};
