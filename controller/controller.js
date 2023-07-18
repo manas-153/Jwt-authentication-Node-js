@@ -63,6 +63,7 @@ const getAllUsers = async (req,res)=>
 const loginuser = async(req,res)=>
 {
     let user_email= req.body.email;
+    
     try{
         // finding the user by email 
            let res_back=await schema.findOne({email:user_email});
@@ -89,7 +90,7 @@ const loginuser = async(req,res)=>
                 minute: "numeric",
                 second: "numeric",});
 
-                let expires_date=new Date(Date.now()+ 180000).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", day: "numeric",
+                let expires_date=new Date(Date.now()+ 600000).toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", day: "numeric",
                 hour: "numeric",
                 minute: "numeric",
                 second: "numeric",});;
@@ -134,6 +135,7 @@ const loginuser = async(req,res)=>
            }
            
     }
+
     catch(err)
     {
         // sending the error details to user if occur 
@@ -203,7 +205,6 @@ const create_user = async(req,res)=>
         });
     }
 }
-
 
 // Clear the cookies storage 
 const logout = async(req,res)=>
