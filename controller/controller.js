@@ -167,7 +167,10 @@ const create_user = async(req,res)=>
         // check whether user already exist or not 
         if(await schema.findOne({email:req.body.email}))
         {
-           res.status(400).send("User already exist");
+           res.status(400).send({
+            status:"Failed",
+            msg:"Failed to Regsiter,It seems like user already exist in our database",
+           });
         }
         else
         {
@@ -237,7 +240,7 @@ const show_secrets = (req,res)=>
                 msg:"Decoded json token and secret Key",
                 Payload:{
                 Decoded_Token: jwt.decode(Token),
-                // Decoded_secret_Key:
+                Secret_Key:process.env.SECRET_KEY
                 }
               })
         }
