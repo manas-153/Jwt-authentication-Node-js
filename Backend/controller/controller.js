@@ -9,7 +9,7 @@ const getAllUsers = async (req,res)=>
 {
     try{
           
-        let Token=req.headers.cookie.substr(27,430);
+        const Token = (req.headers.cookie).split('; ').find(cookie => cookie.startsWith('Jwt=')).split('=')[1] || null;
 
         // if we find tokrn in headers 
         if(Token)
